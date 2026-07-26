@@ -8,7 +8,7 @@ class ServerController extends GetxController with LogMixin {
   final log = ''.obs;
   final deployContent = ''.obs;
   Shell? shell;
-  var shellController = ShellLinesController();
+  var shellController = ShellLinesController(encoding: utf8);
 
   // 仓库切换状态
   final currentRepoUrl = ''.obs;
@@ -118,7 +118,9 @@ class ServerController extends GetxController with LogMixin {
   String get pathScripts => '${rootPathServer.value}\\toolkit\\Scripts';
   Map<String, String> get pathPATH => {
         'PATH':
-            '${rootPathServer.value},$pathGit,$pathPython,$pathAdb,$pathScripts'
+            '${rootPathServer.value},$pathGit,$pathPython,$pathAdb,$pathScripts',
+        'PYTHONUTF8': '1',
+        'PYTHONIOENCODING': 'utf-8',
       };
   Shell get getShell => Shell(
         workingDirectory: rootPathServer.value,
