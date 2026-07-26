@@ -35,6 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   get: ^4.6.6 # 大名鼎鼎的getx
+  http: ^1.2.0 # HTTP请求（卡密验证）
   device_preview: ^1.2.0 # 模拟设备进行响应式调试
   responsive_builder: ^0.7.0 # 响应式布局
   styled_widget: ^0.4.1 # 优雅的写UI,扔掉嵌套地狱吧

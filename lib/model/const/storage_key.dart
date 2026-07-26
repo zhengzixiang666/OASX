@@ -4,4 +4,7 @@ enum StorageKey {
   username,
   password,
   address,
+  // 卡密相关存储键
+  cardKey,
+  cardVerified,
 }

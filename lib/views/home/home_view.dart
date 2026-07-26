@@ -20,80 +20,12 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(milliseconds: 300), () {
-      //延时执行的代码
-      checkUpdate().then((value) => null);
-    });
-
-    return FutureBuilder<ReadmeGithubModel>(
-        future: ApiClient().getGithubReadme(),
-        builder:
-            (BuildContext context, AsyncSnapshot<ReadmeGithubModel> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // 当Future还未完成时，显示加载中的UI
-            return const CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            // 当Future发生错误时，显示错误提示的UI
-            return Text('Error: ${snapshot.error}');
-          } else {
-            // 当Future成功完成时，显示数据
-            String content = snapshot.data?.content ?? githubReadme;
-            return MarkdownWidget(data: content).paddingAll(10);
-          }
-        });
+    // 不再请求 GitHub API 获取 README，直接使用内置内容
+    return MarkdownWidget(data: githubReadme).paddingAll(10);
   }
 
+  // 更新检查已禁用（自定义构建版本，不检查原仓库更新）
   Future<void> checkUpdate() async {
-    if (!kReleaseMode) {
-      return;
-    }
-    if (PlatformUtils.isWeb) {
-      return;
-    }
-    // 获取版本信息
-    GithubVersionModel githubVersionModel =
-        await ApiClient().getGithubVersion();
-    String currentVersion = await getCurrentVersion();
-    String githubVersion = githubVersionModel.version ?? 'v0.0.0';
-    printInfo(info: 'Github Version: $githubVersion');
-    String githubUpdateInfo = githubVersionModel.body ?? 'Something wrong';
-
-    // 对比
-    Widget goOasxRelease = TextButton(
-        onPressed: () async => {await launchUrl(Uri.parse(oasxRelease))},
-        child: Text(I18n.go_oasx_release.tr));
-    if (!compareVersion(currentVersion, githubVersion)) {
-      return;
-    }
-    // 判断是否是微软商店，现在的时间大于发布的时间三天代表有新的版本
-    if (await PlatformUtils().isInstalledFromMicrosoftStore()) {
-      logger.i('You are installed from Microsoft Store');
-      try {
-        DateTime currentTime = DateTime.now();
-        DateTime? dateTimeUpdate =
-            DateTime.tryParse(githubVersionModel.updatedAt ?? '');
-        Duration difference = currentTime.difference(dateTimeUpdate!);
-        if (difference.inDays > 3) {
-          // 日志打印： 当前时间和发布时间过去了多少天
-          logger.i('Difference in days: ${difference.inDays}');
-        } else {
-          return;
-        }
-      } catch (e) {
-        logger.e('Check Update Error: $e');
-        return;
-      }
-    }
-
-    //
-    Widget dialog = SingleChildScrollView(
-            child: <Widget>[
-      Text('${I18n.latest_version.tr}: $githubVersion'),
-      Text('${I18n.current_version.tr}: $currentVersion'),
-      goOasxRelease,
-      MarkdownBody(data: githubUpdateInfo),
-    ].toColumn(crossAxisAlignment: CrossAxisAlignment.start))
-        .constrained(height: 300, width: 300);
-    Get.defaultDialog(title: I18n.find_new_version.tr, content: dialog);
+    return;
   }
 }

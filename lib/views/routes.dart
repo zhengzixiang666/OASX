@@ -3,14 +3,22 @@ import 'package:get/get.dart';
 import 'package:oasx/views/layout/layout.dart';
 import 'package:oasx/views/layout/binding.dart';
 import 'package:oasx/views/login/login_view.dart';
+import 'package:oasx/views/card_login/card_login_view.dart';
 import 'package:oasx/views/settings/settings_view.dart';
 import 'package:oasx/views/server/server_view.dart';
 
 class Routes {
-  /// when the app is opened, this page will be the first to be shown
-  static const initial = '/login';
+  /// 应用启动后第一个显示的页面 —— 卡密登录页
+  static const initial = '/card-login';
 
   static final routes = [
+    // 卡密登录页（入口）
+    GetPage(
+      name: '/card-login',
+      page: () => CardLoginView(),
+      binding: CardLoginBinding(),
+    ),
+    // 服务器连接登录页
     GetPage(
       name: '/login',
       page: () => LoginView(),

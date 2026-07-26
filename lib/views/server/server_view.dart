@@ -42,6 +42,7 @@ class ServerView extends StatelessWidget {
             toggleType: ToggleType.expandOnlyCurrent,
             children: [
               path(context),
+              repoSelector(context),
               deploy(constraints.maxHeight - 200, context),
             ],
           ),
@@ -102,6 +103,99 @@ class ServerView extends StatelessWidget {
       children: [
         path,
         Text(I18n.root_path_server_help.tr),
+      ],
+    );
+  }
+
+  ExpansionTileItem repoSelector(BuildContext context) {
+    return ExpansionTileItem(
+      initiallyExpanded: false,
+      isHasTopBorder: false,
+      isHasBottomBorder: false,
+      collapsedBackgroundColor:
+          Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.24),
+      borderRadius: const BorderRadius.all(Radius.circular(10)),
+      title: Text('仓库切换',
+          style: Theme.of(context).textTheme.titleMedium),
+      children: [
+        GetX<ServerController>(builder: (controller) {
+          if (!controller.rootPathAuthenticated.value) {
+            return const Text('请先设置正确的 OAS 根目录');
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 当前仓库信息
+              if (controller.currentRepoUrl.value.isNotEmpty) ...[
+                Text('当前仓库:', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                Text(controller.safeRepoUrl,
+                    style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
+                Text('分支: ${controller.currentBranch.value}',
+                    style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
+                const SizedBox(height: 8),
+              ],
+              // 预设列表
+              ...ServerController.repoPresets.map((preset) {
+                var isActive = controller.selectedPreset.value == preset['id'];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: isActive ? Colors.green : Colors.grey[300]!,
+                      width: isActive ? 2 : 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    color: isActive ? Colors.green.withOpacity(0.05) : null,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isActive ? Icons.check_circle : Icons.radio_button_unchecked,
+                        color: isActive ? Colors.green : Colors.grey,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(preset['name']!,
+                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                                if (isActive)
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 6),
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Text('当前', style: TextStyle(fontSize: 10, color: Colors.white)),
+                                  ),
+                              ],
+                            ),
+                            Text(preset['desc']!,
+                                style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                          ],
+                        ),
+                      ),
+                      if (!isActive)
+                        TextButton(
+                          onPressed: () => controller.switchRepo(preset['id']!),
+                          child: const Text('切换', style: TextStyle(fontSize: 12)),
+                        ),
+                    ],
+                  ),
+                );
+              }),
+              const SizedBox(height: 4),
+              Text('切换后点击右下角按钮重启服务即可生效',
+                  style: TextStyle(fontSize: 11, color: Colors.orange[700])),
+            ],
+          );
+        }),
       ],
     );
   }
