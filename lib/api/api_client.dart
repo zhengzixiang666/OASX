@@ -7,10 +7,7 @@ import 'package:oasx/api/api_interceptor.dart';
 import 'package:oasx/component/dio_http_cache/dio_http_cache.dart';
 import 'package:oasx/config/translation/i18n.dart';
 import 'package:oasx/config/translation/i18n_content.dart';
-import 'package:oasx/utils/check_version.dart';
-import 'package:oasx/config/constants.dart';
 import 'package:oasx/controller/settings.dart';
-import './home_model.dart';
 import './update_info_model.dart';
 
 /// common result
@@ -61,29 +58,37 @@ class ApiClient {
   }
 
   /// common request method
-  Future<ApiResult<T>> request<T>(Future<Result<T>> Function() apiFn) async {
+  ///
+  /// [silent] 为 true 时不弹错误提示（用于页面加载时的自动请求，
+  /// 避免 yys.exe 未启动时弹出"网络错误"打扰用户）
+  Future<ApiResult<T>> request<T>(Future<Result<T>> Function() apiFn,
+      {bool silent = false}) async {
     try {
       final res = await apiFn();
       return res.when(
         success: (data) => ApiResult.success(data),
         failure: (msg, code) {
           printError(info: '${I18n.network_error_code}: $msg | $code'.tr);
-          switch (code) {
-            case 403:
-              break;
-            case 404:
-              showNetErrCodeSnackBar(I18n.network_not_found.tr, code);
-              break;
-            default:
-              showNetErrCodeSnackBar(msg, code);
-              break;
+          if (!silent) {
+            switch (code) {
+              case 403:
+                break;
+              case 404:
+                showNetErrCodeSnackBar(I18n.network_not_found.tr, code);
+                break;
+              default:
+                showNetErrCodeSnackBar(msg, code);
+                break;
+            }
           }
           return ApiResult.failure(msg, code);
         },
       );
     } catch (e) {
       printError(info: '${I18n.network_error.tr}: $e');
-      showNetErrSnackBar();
+      if (!silent) {
+        showNetErrSnackBar();
+      }
       return ApiResult.failure(e.toString());
     }
   }
@@ -117,30 +122,14 @@ class ApiClient {
     return false;
   }
 
-  Future<GithubVersionModel> getGithubVersion() async {
-    final res = await request(() => get(
-          updateUrlGithub,
-          options: buildCacheOptions(const Duration(days: 7)),
-          decodeType: GithubVersionModel(),
-        ));
-    return res.isSuccess ? res.data : GithubVersionModel();
-  }
-
-  Future<ReadmeGithubModel> getGithubReadme() async {
-    final res = await request(() => get(
-          readmeUrlGithub,
-          options: buildCacheOptions(const Duration(days: 7),
-              options: Options(extra: {"cache": true})),
-          decodeType: ReadmeGithubModel(),
-        ));
-    return res.isSuccess ? res.data : ReadmeGithubModel();
-  }
-
   Future<UpdateInfoModel> getUpdateInfo() async {
-    final res = await request(() => get(
-          '/home/update_info',
-          decodeType: UpdateInfoModel(),
-        ));
+    final res = await request(
+      () => get(
+        '/home/update_info',
+        decodeType: UpdateInfoModel(),
+      ),
+      silent: true,
+    );
     return res.isSuccess ? res.data : UpdateInfoModel();
   }
 

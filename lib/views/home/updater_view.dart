@@ -26,6 +26,13 @@ class UpdaterView extends StatelessWidget {
           } else {
             // 当Future成功完成时，显示数据
             UpdateInfoModel data = snapshot.data!;
+            // yys.exe 未启动时 getUpdateInfo 返回空模型，isUpdate 为 null
+            if (data.isUpdate == null) {
+              return Center(
+                child: Text(I18n.network_error.tr,
+                    style: Theme.of(context).textTheme.bodyMedium),
+              ).paddingAll(20);
+            }
             return SingleChildScrollView(
               child: content(data, context).paddingAll(20),
             );

@@ -13,7 +13,6 @@ import 'package:oasx/utils/check_version.dart';
 import 'package:oasx/config/translation/i18n_content.dart';
 import 'package:oasx/api/home_model.dart';
 import 'package:oasx/config/github_readme.dart' show githubReadme;
-import 'package:oasx/config/constants.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({Key? key}) : super(key: key);
