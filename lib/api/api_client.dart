@@ -95,7 +95,7 @@ class ApiClient {
 
 // ----------------------------------   服务端地址测试   ----------------------------------
   Future<bool> testAddress() async {
-    final res = await request(() => get('/test'));
+    final res = await request(() => get('/test'), silent: true);
     return res.isSuccess && res.data == 'success';
   }
 
@@ -252,8 +252,18 @@ class ApiClient {
   }
 
   void showNetErrCodeSnackBar(String msg, int code) {
-    Get.snackbar(
-        I18n.network_error.tr, '${I18n.network_error_code.tr}: $code | $msg',
-        duration: const Duration(seconds: 2));
+    // 不显示 Dio 的完整英文错误消息，只显示简洁的中文提示
+    String hint = '';
+    if (code >= 500) {
+      hint = 'yys.exe 服务异常，请重启后重试';
+    } else if (code == 404) {
+      hint = '接口不存在';
+    } else if (code == 403) {
+      hint = '无权限访问';
+    } else {
+      hint = '请检查 yys.exe 是否已启动';
+    }
+    Get.snackbar(I18n.network_error.tr, '${I18n.network_error_code.tr}: $code | $hint',
+        duration: const Duration(seconds: 3));
   }
 }

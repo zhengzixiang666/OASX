@@ -35,7 +35,8 @@ class LoginController extends GetxController {
     if (await ApiClient().testAddress()) {
       Get.offAllNamed('/main');
     } else {
-      Get.snackbar('Error', 'Failed to connect to OAS server');
+      Get.snackbar('连接失败', '无法连接到 yys.exe，请先在「服务器」页面启动服务',
+          duration: const Duration(seconds: 4));
     }
   }
 }
