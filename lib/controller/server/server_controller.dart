@@ -139,15 +139,38 @@ class ServerController extends GetxController with LogMixin {
     }
   }
 
-  void run() {
+  Future<void> run() async {
     clearLog();
-    shell!.kill();
-    runShell('echo OAS working directory: ').then((value) => null);
-    runShell('pwd').then((value) => null);
-    runShell('python -m deploy.installer').then((value) => null);
-    runShell('echo Start OAS').then((value) => null);
-    runShell('taskkill /f /t /im pythonw.exe').then((value) => null);
-    runShell(".\\toolkit\\pythonw.exe  server.py").then((value) => null);
+    await runShell('echo OAS working directory: ');
+    await runShell('pwd');
+    await runShell('taskkill /f /t /im pythonw.exe');
+    await runShell('taskkill /f /t /im python.exe');
+    // 使用 Process.start 启动 python.exe（替代不稳定的 pythonw.exe）
+    // ProcessStartMode.detachedWithStdio: 不显示控制台窗口，但可读取输出
+    try {
+      final env = Map<String, String>.from(Platform.environment);
+      env['PATH'] =
+          '${rootPathServer.value},$pathGit,$pathPython,$pathAdb,$pathScripts';
+      env['PYTHONUTF8'] = '1';
+      env['PYTHONIOENCODING'] = 'utf-8';
+      final process = await Process.start(
+        '${rootPathServer.value}\\toolkit\\python.exe',
+        ['server.py'],
+        workingDirectory: rootPathServer.value,
+        mode: ProcessStartMode.detachedWithStdio,
+        runInShell: false,
+        environment: env,
+      );
+      process.stdout.transform(utf8.decoder).listen((data) {
+        addLog(data);
+      });
+      process.stderr.transform(utf8.decoder).listen((data) {
+        addLog(data);
+      });
+      addLog('INFO: yys.exe 已启动 (PID: ${process.pid})');
+    } catch (e) {
+      addLog('ERROR: 启动 yys.exe 失败: $e');
+    }
   }
 
   void readDeploy() {
