@@ -141,12 +141,28 @@ class ServerController extends GetxController with LogMixin {
 
   Future<void> run() async {
     clearLog();
-    await runShell('echo OAS working directory: ');
-    await runShell('pwd');
-    await runShell('taskkill /f /t /im pythonw.exe');
-    await runShell('taskkill /f /t /im python.exe');
-    // 使用 Process.start 启动 python.exe（替代不稳定的 pythonw.exe）
-    // ProcessStartMode.detachedWithStdio: 不显示控制台窗口，但可读取输出
+    // 直接用 Process.run 执行命令，避免 runInShell 弹出 cmd 黑窗
+    try {
+      final killResult = await Process.run(
+        'taskkill',
+        ['/f', '/t', '/im', 'pythonw.exe'],
+        runInShell: false,
+      );
+      if (killResult.exitCode == 0) {
+        addLog('INFO: 已终止 pythonw.exe');
+      }
+    } catch (_) {}
+    try {
+      final killResult = await Process.run(
+        'taskkill',
+        ['/f', '/t', '/im', 'python.exe'],
+        runInShell: false,
+      );
+      if (killResult.exitCode == 0) {
+        addLog('INFO: 已终止 python.exe');
+      }
+    } catch (_) {}
+    // 使用 Process.start 启动 pythonw.exe（无窗口版，不弹控制台）
     try {
       final env = Map<String, String>.from(Platform.environment);
       env['PATH'] =
@@ -154,7 +170,7 @@ class ServerController extends GetxController with LogMixin {
       env['PYTHONUTF8'] = '1';
       env['PYTHONIOENCODING'] = 'utf-8';
       final process = await Process.start(
-        '${rootPathServer.value}\\toolkit\\python.exe',
+        '${rootPathServer.value}\\toolkit\\pythonw.exe',
         ['server.py'],
         workingDirectory: rootPathServer.value,
         mode: ProcessStartMode.normal,
