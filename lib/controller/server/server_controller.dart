@@ -157,7 +157,7 @@ class ServerController extends GetxController with LogMixin {
         '${rootPathServer.value}\\toolkit\\python.exe',
         ['server.py'],
         workingDirectory: rootPathServer.value,
-        mode: ProcessStartMode.detachedWithStdio,
+        mode: ProcessStartMode.normal,
         runInShell: false,
         environment: env,
       );
