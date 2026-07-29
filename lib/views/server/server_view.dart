@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:oasx/component/log/log_mixin.dart';
 import 'package:oasx/component/log/log_widget.dart';
 import 'package:process_run/shell.dart';
+import 'package:get_storage/get_storage.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:styled_widget/styled_widget.dart';
