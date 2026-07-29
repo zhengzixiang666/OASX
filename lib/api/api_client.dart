@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:dio/io.dart';
 import 'package:flutter_nb_net/flutter_net.dart';
 import 'package:get/get.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
@@ -30,13 +32,20 @@ class ApiClient {
   static final ApiClient _instance = ApiClient._internal();
   factory ApiClient() => _instance;
   ApiClient._internal() {
+    // 防御性获取 temporaryDirectory：SettingsController 可能尚未注册
+    // （在 OASXApp.onInit 中才注册，而 LoginController.onInit 可能在之前触发）
+    String tempDir = './';
+    if (Get.isRegistered<SettingsController>()) {
+      tempDir = Get.find<SettingsController>().temporaryDirectory;
+    }
+
     NetOptions.instance
-        .setConnectTimeout(const Duration(seconds: 3))
+        .setConnectTimeout(const Duration(seconds: 5))
+        .setReceiveTimeout(const Duration(seconds: 10))
         .enableLogger(false)
         .addInterceptor(DioCacheInterceptor(
             options: CacheOptions(
-          store:
-              FileCacheStore(Get.find<SettingsController>().temporaryDirectory),
+          store: FileCacheStore(tempDir),
           policy: CachePolicy.request,
           hitCacheOnErrorExcept: [401, 403],
           maxStale: const Duration(days: 7),
@@ -46,6 +55,15 @@ class ApiClient {
           allowPostMethod: false,
         )))
         .addInterceptor(ApiInterceptor())
+        .setHttpClientAdapter(IOHttpClientAdapter(
+          createHttpClient: () {
+            // 创建不使用代理的 HttpClient，避免 Clash Verge 等代理拦截本地请求
+            final client = HttpClient()
+              ..idleTimeout = const Duration(seconds: 3)
+              ..findProxy = (uri) => 'DIRECT';
+            return client;
+          },
+        ))
         .create();
   }
 
@@ -239,6 +257,17 @@ class ApiClient {
           queryParameters: {'types': type, 'value': value},
         ));
     return res.isSuccess && res.data == true;
+  }
+
+// ---------------------------------   任务调度操作   ----------------------------------
+
+  Future<bool> syncNextRun(String scriptName, String task,
+      {String? targetDt}) async {
+    final res = await request(() => put(
+          '/$scriptName/$task/sync_next_run',
+          queryParameters: {'target_dt': targetDt ?? ''},
+        ));
+    return res.isSuccess;
   }
 
 // ---------------------------------   Snackbar --------------------------------
