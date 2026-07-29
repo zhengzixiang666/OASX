@@ -13,6 +13,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:oasx/views/nav/view_nav.dart';
 import 'package:oasx/config/translation/i18n_content.dart';
+import 'package:oasx/config/translation/i18n.dart';
+import 'package:oasx/api/api_client.dart';
 
 part '../../controller/overview/overview_controller.dart';
 part '../../controller/overview/taskitem_model.dart';
@@ -84,7 +86,7 @@ class _WaitingWidget extends StatelessWidget {
       Expanded(child: Obx(() {
         return ListView.builder(
             itemBuilder: (context, index) =>
-                TaskItemView(controller.scriptModel.waitingTaskList[index]),
+                TaskItemView(controller.scriptModel.waitingTaskList[index], status: 'waiting'),
             itemCount: controller.scriptModel.waitingTaskList.length);
       }))
     ]
@@ -115,7 +117,7 @@ class _PendingWidget extends StatelessWidget {
           child: Obx(() {
             return ListView.builder(
                 itemBuilder: (context, index) =>
-                    TaskItemView(controller.scriptModel.pendingTaskList[index]),
+                    TaskItemView(controller.scriptModel.pendingTaskList[index], status: 'pending'),
                 itemCount: controller.scriptModel.pendingTaskList.length);
           }))
     ]
@@ -140,7 +142,7 @@ class _RunningWidget extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium),
       const Divider(),
       Obx(() {
-        return TaskItemView(controller.scriptModel.runningTask.value);
+        return TaskItemView(controller.scriptModel.runningTask.value, status: 'running');
       })
     ]
         .toColumn(crossAxisAlignment: CrossAxisAlignment.start)

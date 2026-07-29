@@ -28,6 +28,8 @@ final Map<String, String> _cn_ui = {
   I18n.pending: '队列中',
   I18n.waiting: '等待中',
   I18n.task_setting: '设置',
+  I18n.task_postpone: '推迟',
+  I18n.task_run_now: '立刻执行',
   I18n.log: '日志',
   I18n.clear_log: '清空日志',
   I18n.login: '登录',
@@ -142,6 +144,23 @@ final Map<String, String> _cn_menu = {
   I18n.memory_scrolls: '绘卷',
   I18n.demon_retreat: '首领退治',
   I18n.dye_trials: '灵染试炼',
+  // 菜单分类翻译（后端script_menu发送的分类名）
+  'Config': '配置',
+  'Daily Task': '日常任务',
+  'Dungeon Task': '副本任务',
+  'Guild Task': '寮任务',
+  'Weekly Task': '每周任务',
+  'Version Activity': '限时活动',
+  'Permission Task': '特殊任务',
+  'other': '其他',
+  // 缺失的任务名翻译
+  'ActivityCommon': '当期活动',
+  'ActivityCommon2': '当期活动2',
+  'ActivitySimple': '简单活动',
+  'NianTrue': '真年兽',
+  'LBS': 'LBS',
+  'SwitchAccountMany': '多开切换',
+  'Netherworld': '阴界之门',
 };
 
 final Map<String, String> _cn_script = {
