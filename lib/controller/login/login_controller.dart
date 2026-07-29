@@ -1,4 +1,4 @@
-part of login;
+﻿part of login;
 
 class LoginController extends GetxController {
   static bool logined = false;

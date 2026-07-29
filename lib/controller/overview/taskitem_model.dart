@@ -3,8 +3,9 @@ part of overview;
 class TaskItemModel {
   final String taskName;
   final String nextRun;
+  final String status; // 'running' | 'pending' | 'waiting'
 
-  const TaskItemModel(this.taskName, this.nextRun);
+  const TaskItemModel(this.taskName, this.nextRun, {this.status = ''});
 
   static TaskItemModel empty(){
     return const TaskItemModel('', '');
@@ -20,8 +21,9 @@ class TaskItemModel {
       other is TaskItemModel &&
           runtimeType == other.runtimeType &&
           taskName == other.taskName &&
-          nextRun == other.nextRun;
+          nextRun == other.nextRun &&
+          status == other.status;
 
   @override
-  int get hashCode => Object.hash(taskName, nextRun);
+  int get hashCode => Object.hash(taskName, nextRun, status);
 }

@@ -28,6 +28,8 @@ class I18n {
   static const String pending = 'Pendings';
   static const String waiting = 'Waitings';
   static const String task_setting = 'Task Setting';
+  static const String task_postpone = 'Task Postpone';
+  static const String task_run_now = 'Task Run Now';
   static const String log = 'Log';
   static const String clear_log = 'Clear Log';
   static const String login = 'Login';

@@ -241,6 +241,17 @@ class ApiClient {
     return res.isSuccess && res.data == true;
   }
 
+// ---------------------------------   任务调度操作   ----------------------------------
+
+  Future<bool> syncNextRun(String scriptName, String task,
+      {String? targetDt}) async {
+    final res = await request(() => put(
+          '/$scriptName/$task/sync_next_run',
+          queryParameters: {'target_dt': targetDt ?? ''},
+        ));
+    return res.isSuccess;
+  }
+
 // ---------------------------------   Snackbar --------------------------------
   void showDialog(String title, String content) {
     Get.snackbar(title, content);
