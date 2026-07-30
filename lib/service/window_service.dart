@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,5 +29,19 @@ class WindowService extends GetxService with WindowListener {
       windowManager.addListener(this);
     }
     super.onInit();
+  }
+
+  /// 窗口关闭时自动杀掉 yys.exe（pythonw.exe / python.exe）
+  @override
+  void onWindowClose() async {
+    await windowManager.setPreventClose(true);
+    try {
+      await Process.run('taskkill', ['/f', '/t', '/im', 'pythonw.exe'],
+          runInShell: false);
+      await Process.run('taskkill', ['/f', '/t', '/im', 'python.exe'],
+          runInShell: false);
+    } catch (_) {}
+    await windowManager.setPreventClose(false);
+    await windowManager.destroy();
   }
 }
