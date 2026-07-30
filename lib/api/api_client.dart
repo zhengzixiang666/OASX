@@ -113,8 +113,14 @@ class ApiClient {
 
 // ----------------------------------   服务端地址测试   ----------------------------------
   Future<bool> testAddress() async {
-    final res = await request(() => get('/test'), silent: true);
-    return res.isSuccess && res.data == 'success';
+    // 直接用 Dio 发请求，绕过 flutter_nb_net 的 connectivity 检查
+    // 因为 OASX 连接的是本地 yys.exe，不需要互联网连接
+    try {
+      final response = await NetOptions.instance.dio.get('/test');
+      return response.data == 'success';
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<bool> killServer() async {
