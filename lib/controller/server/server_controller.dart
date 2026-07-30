@@ -142,9 +142,7 @@ class ServerController extends GetxController with LogMixin {
   Future<void> run() async {
     clearLog();
 
-    // 写入卡密文件供 yys.exe 验证使用
-    _writeCardKeyFile();
-
+    // yys.exe 启动时会自动从配置文件读取 card_key，无需 OASX 写入
     // 直接用 Process.run 执行命令，避免 runInShell 弹出 cmd 黑窗
     try {
       final killResult = await Process.run(
@@ -190,28 +188,6 @@ class ServerController extends GetxController with LogMixin {
       addLog('INFO: yys.exe 已启动 (PID: ${process.pid})');
     } catch (e) {
       addLog('ERROR: 启动 yys.exe 失败: $e');
-    }
-  }
-
-  /// 将卡密和设备ID写入 config/card_key.txt
-  /// yys.exe 启动时读取此文件进行卡密验证
-  void _writeCardKeyFile() {
-    try {
-      final storage = GetStorage();
-      final cardKey = storage.read<String>('card_key') ?? '';
-      final deviceId = storage.read<String>('device_id') ?? '';
-
-      if (cardKey.isEmpty || deviceId.isEmpty) {
-        addLog('WARN: 卡密或设备ID为空，yys.exe 可能无法启动');
-        return;
-      }
-
-      final cardFile = File('${rootPathServer.value}\\config\\card_key.txt');
-      final jsonData = '{"card_key": "$cardKey", "device_id": "$deviceId"}';
-      cardFile.writeAsStringSync(jsonData);
-      addLog('INFO: 卡密文件已写入');
-    } catch (e) {
-      addLog('ERROR: 写入卡密文件失败: $e');
     }
   }
 

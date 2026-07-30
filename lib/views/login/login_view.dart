@@ -8,8 +8,6 @@ import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import 'package:oasx/api/api_client.dart';
-import 'package:oasx/services/card_api_service.dart';
-import 'package:oasx/services/device_service.dart';
 import 'package:oasx/views/layout/appbar.dart';
 import 'package:oasx/utils/platform_utils.dart';
 
@@ -39,12 +37,10 @@ class LoginView extends StatelessWidget {
     return FormBuilder(
       key: _formKey,
       child: <Widget>[
-        _title(context),
-        _cardKey(),
+        _admin(context),
         _address(),
         _username(),
         _password(),
-        _cardError(),
         _signin()
       ].toColumn(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -57,35 +53,16 @@ class LoginView extends StatelessWidget {
         .alignment(Alignment.center);
   }
 
-  Widget _title(BuildContext context) {
+  Widget _admin(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    return Icon(
-      Icons.verified_user_rounded,
-      size: 48,
-      color: theme.colorScheme.primary,
-    ).padding(bottom: 8);
-  }
-
-  Widget _cardKey() {
-    LoginController loginController = Get.find<LoginController>();
-    return FormBuilderTextField(
-      name: 'card_key',
-      initialValue: loginController.cardKey.value,
-      decoration: const InputDecoration(
-        labelText: '卡密',
-        hintText: 'YYS-XXXX-XXXX-XXXX-XXXX',
-        prefixIcon: Icon(Icons.key_rounded),
-      ),
-    ).padding(horizontal: 20, top: 5);
-  }
-
-  Widget _address() {
-    LoginController loginController = Get.find<LoginController>();
-    return FormBuilderTextField(
-      name: 'address',
-      initialValue: loginController.address.value,
-      decoration: const InputDecoration(labelText: 'Address'),
-    ).padding(horizontal: 20, top: 20);
+    return Text(
+      'Admin Login',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+          color: theme.colorScheme.primary,
+          fontSize: 24,
+          fontWeight: FontWeight.bold),
+    ).padding(horizontal: 20);
   }
 
   Widget _username() {
@@ -94,7 +71,7 @@ class LoginView extends StatelessWidget {
       name: 'username',
       initialValue: loginController.username.value,
       decoration: const InputDecoration(labelText: 'Username'),
-    ).padding(horizontal: 20, top: 20);
+    ).padding(horizontal: 20, top: 5);
   }
 
   Widget _password() {
@@ -107,59 +84,24 @@ class LoginView extends StatelessWidget {
     ).padding(horizontal: 20, top: 20);
   }
 
-  Widget _cardError() {
-    return Obx(() {
-      final c = Get.find<LoginController>();
-      if (c.cardError.value.isNotEmpty) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Container(
-            margin: const EdgeInsets.only(top: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.red[50],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.red[200]!),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.error_outline, color: Colors.red[700], size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    c.cardError.value,
-                    style: TextStyle(color: Colors.red[700], fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-      return const SizedBox.shrink();
-    });
+  Widget _address() {
+    LoginController loginController = Get.find<LoginController>();
+    return FormBuilderTextField(
+      name: 'address',
+      initialValue: loginController.address.value,
+      decoration: const InputDecoration(labelText: 'Address'),
+    ).padding(horizontal: 20, top: 20);
   }
 
   Widget _signin() {
     LoginController loginController = Get.find<LoginController>();
-    return Obx(() {
-      if (loginController.isVerifying.value) {
-        return const Column(
-          children: [
-            CircularProgressIndicator(strokeWidth: 3),
-            SizedBox(height: 12),
-            Text('正在验证...', style: TextStyle(fontSize: 14, color: Colors.grey)),
-          ],
-        ).padding(horizontal: 20, top: 40);
-      }
-      return ElevatedButton(
-        onPressed: () async => {
-          if (_formKey.currentState?.saveAndValidate() ?? false)
-            {await loginController.toMain(data: _formKey.currentState!.value)}
-        },
-        child: const Text('Login'),
-      ).padding(horizontal: 20, top: 40);
-    });
+    return ElevatedButton(
+      onPressed: () async => {
+        if (_formKey.currentState?.saveAndValidate() ?? false)
+          {await loginController.toMain(data: _formKey.currentState!.value)}
+      },
+      child: const Text('Login'),
+    ).padding(horizontal: 20, top: 40);
   }
 
   Widget _serverButton() {

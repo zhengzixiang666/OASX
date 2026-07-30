@@ -7,11 +7,11 @@ import 'package:oasx/views/settings/settings_view.dart';
 import 'package:oasx/views/server/server_view.dart';
 
 class Routes {
-  /// 应用启动后第一个显示的页面 —— 登录页（含卡密+服务器地址）
+  /// 应用启动后第一个显示的页面 —— 服务器登录页
   static const initial = '/login';
 
   static final routes = [
-    // 服务器连接登录页（含卡密验证）
+    // 服务器连接登录页
     GetPage(
       name: '/login',
       page: () => LoginView(),
