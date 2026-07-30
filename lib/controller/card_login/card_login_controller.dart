@@ -25,12 +25,8 @@ class CardLoginController extends GetxController {
     // 读取缓存的卡密
     cardKey.value = storage.read(_storageCardKey) ?? '';
 
-    // 如果之前已验证通过，直接跳过
-    bool? verified = storage.read(_storageVerifiedKey);
-    if (verified == true && cardKey.value.isNotEmpty) {
-      // 后台静默验证，通过则直接跳转
-      _silentVerify();
-    }
+    // 每次都显示卡密登录页，不自动跳过
+    // 但输入框保留上次的卡密，用户直接点验证即可
 
     super.onInit();
   }
