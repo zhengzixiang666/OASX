@@ -94,11 +94,10 @@ class LoginView extends StatelessWidget {
   }
 
   Widget _signin() {
-    LoginController loginController = Get.find<LoginController>();
     return ElevatedButton(
       onPressed: () async => {
         if (_formKey.currentState?.saveAndValidate() ?? false)
-          {await loginController.toMain(data: _formKey.currentState!.value)}
+          {await Get.find<LoginController>().toMain(data: _formKey.currentState!.value)}
       },
       child: const Text('Login'),
     ).padding(horizontal: 20, top: 40);

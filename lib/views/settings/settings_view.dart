@@ -19,6 +19,7 @@ class SettingsView extends StatelessWidget {
           child: <Widget>[
         const _ThemeWidget().paddingAll(5),
         const _LanguageWidget().paddingAll(5),
+        const _CardKeyWidget().paddingAll(5),
         killServerButton(),
         _exitButton(),
       ].toColumn().alignment(Alignment.center)),
@@ -101,5 +102,59 @@ class _LanguageWidget extends StatelessWidget {
         ).constrained(maxHeight: 40);
       })
     ].toColumn();
+  }
+}
+
+class _CardKeyWidget extends StatelessWidget {
+  const _CardKeyWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<SettingsController>();
+    final textController = TextEditingController();
+
+    return Obx(() {
+      final saved = controller.cardSaved.value;
+      return <Widget>[
+        Text('卡密激活', style: Theme.of(context).textTheme.titleMedium)
+            .paddingOnly(bottom: 5),
+        if (saved) ...[
+          // 已保存状态
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 18),
+              const SizedBox(width: 6),
+              Text(controller.maskedCardKey,
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 13)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => controller.clearCardKey(),
+            child: const Text('清除卡密', style: TextStyle(fontSize: 13)),
+          ),
+        ] else ...[
+          // 未保存状态：输入框
+          SizedBox(
+            width: 280,
+            child: TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                hintText: 'YYS-XXXX-XXXX-XXXX-XXXX',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => controller.saveCardKey(textController.text),
+            child: const Text('保存卡密'),
+          ),
+        ],
+      ].toColumn();
+    });
   }
 }

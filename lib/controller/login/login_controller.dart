@@ -13,12 +13,10 @@ class LoginController extends GetxController {
   Future<void> onInit() async {
     username.value = storage.read(StorageKey.username.name) ?? '';
     password.value = storage.read(StorageKey.password.name) ?? '';
-    address.value = storage.read(StorageKey.address.name) ?? '';
+    // 用户版默认本机地址，用户可修改
+    address.value = storage.read(StorageKey.address.name) ?? '127.0.0.1:22288';
 
-    if (address.value.isNotEmpty && !logined) {
-      logined = true;
-      await login(address.value);
-    }
+    // 不自动登录，等用户手动点 Login
     super.onInit();
   }
 
