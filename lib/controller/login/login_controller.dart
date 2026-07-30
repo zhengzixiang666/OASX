@@ -3,32 +3,18 @@ part of login;
 
 class LoginController extends GetxController {
   static bool logined = false;
-  var username = ''.obs;
-  var password = ''.obs;
   var address = ''.obs;
-
-  GetStorage storage = GetStorage();
 
   @override
   Future<void> onInit() async {
-    username.value = storage.read(StorageKey.username.name) ?? '';
-    password.value = storage.read(StorageKey.password.name) ?? '';
-    address.value = storage.read(StorageKey.address.name) ?? '';
+    // 用户版固定本机地址，自动连接
+    address.value = '127.0.0.1:22288';
 
-    if (address.value.isNotEmpty && !logined) {
+    if (!logined) {
       logined = true;
       await login(address.value);
     }
     super.onInit();
-  }
-
-  /// 进入主页面
-  Future<void> toMain({required Map<String, dynamic> data}) async {
-    storage.write(StorageKey.username.name, data['username']);
-    storage.write(StorageKey.password.name, data['password']);
-    storage.write(StorageKey.address.name, data['address']);
-    printInfo(info: data.toString());
-    await login(data['address']);
   }
 
   Future<void> login(String address) async {
@@ -36,7 +22,7 @@ class LoginController extends GetxController {
     if (await ApiClient().testAddress()) {
       Get.offAllNamed('/main');
     } else {
-      Get.snackbar('连接失败', '无法连接到 yys.exe，请先在「服务器」页面启动服务',
+      Get.snackbar('连接失败', '无法连接到 yys.exe，请点击右下角按钮启动服务',
           duration: const Duration(seconds: 4));
     }
   }

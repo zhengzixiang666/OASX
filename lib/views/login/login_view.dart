@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:oasx/model/const/storage_key.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import 'package:oasx/api/api_client.dart';
 import 'package:oasx/views/layout/appbar.dart';
@@ -15,93 +14,45 @@ part './login_binding.dart';
 part '../../controller/login/login_controller.dart';
 
 class LoginView extends StatelessWidget {
-  LoginView({Key? key}) : super(key: key);
-  final _formKey = GlobalKey<FormBuilderState>();
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildPlatformAppBar(context, isCollapsed: false),
       floatingActionButton: PlatformUtils.isWindows ? _serverButton() : null,
-      body: _login(context),
+      body: _body(context),
     );
   }
 
-  Widget _login(BuildContext context) {
-    List<double> maxWidthHigh = switch (Theme.of(context).platform) {
-      TargetPlatform.windows => [400, 500],
-      TargetPlatform.linux => [400, 500],
-      TargetPlatform.macOS => [400, 500],
-      _ => [],
-    };
-    return FormBuilder(
-      key: _formKey,
-      child: <Widget>[
-        _admin(context),
-        _address(),
-        _username(),
-        _password(),
-        _signin()
-      ].toColumn(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center),
-    )
-        .padding(vertical: 10)
-        .constrained(
-            maxHeight: maxWidthHigh.isNotEmpty ? maxWidthHigh[0] : 500,
-            maxWidth: maxWidthHigh.isNotEmpty ? maxWidthHigh[1] : 400)
-        .alignment(Alignment.center);
-  }
-
-  Widget _admin(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    return Text(
-      'Admin Login',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-          color: theme.colorScheme.primary,
-          fontSize: 24,
-          fontWeight: FontWeight.bold),
-    ).padding(horizontal: 20);
-  }
-
-  Widget _username() {
-    LoginController loginController = Get.find<LoginController>();
-    return FormBuilderTextField(
-      name: 'username',
-      initialValue: loginController.username.value,
-      decoration: const InputDecoration(labelText: 'Username'),
-    ).padding(horizontal: 20, top: 5);
-  }
-
-  Widget _password() {
-    LoginController loginController = Get.find<LoginController>();
-    return FormBuilderTextField(
-      name: 'password',
-      initialValue: loginController.password.value,
-      decoration: const InputDecoration(labelText: 'Password'),
-      obscureText: true,
-    ).padding(horizontal: 20, top: 20);
-  }
-
-  Widget _address() {
-    LoginController loginController = Get.find<LoginController>();
-    return FormBuilderTextField(
-      name: 'address',
-      initialValue: loginController.address.value,
-      decoration: const InputDecoration(labelText: 'Address'),
-    ).padding(horizontal: 20, top: 20);
-  }
-
-  Widget _signin() {
-    LoginController loginController = Get.find<LoginController>();
-    return ElevatedButton(
-      onPressed: () async => {
-        if (_formKey.currentState?.saveAndValidate() ?? false)
-          {await loginController.toMain(data: _formKey.currentState!.value)}
-      },
-      child: const Text('Login'),
-    ).padding(horizontal: 20, top: 40);
+  Widget _body(BuildContext context) {
+    return <Widget>[
+      // 自动连接动画
+      const SizedBox(
+        width: 40,
+        height: 40,
+        child: CircularProgressIndicator(strokeWidth: 3),
+      ),
+      const SizedBox(height: 20),
+      Text(
+        '正在连接服务器...',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+          fontSize: 16,
+        ),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        '如果长时间无响应，请点击右下角按钮启动服务',
+        style: TextStyle(
+          color: Colors.grey[600],
+          fontSize: 12,
+        ),
+      ),
+    ].toColumn(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+    ).alignment(Alignment.center);
   }
 
   Widget _serverButton() {
