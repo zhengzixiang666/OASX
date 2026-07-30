@@ -9,6 +9,7 @@ class ServerController extends GetxController with LogMixin {
   final deployContent = ''.obs;
   Shell? shell;
   var shellController = ShellLinesController(encoding: utf8);
+  bool _isRunning = false; // 防止重复点击启动
 
   @override
   void onInit() {
@@ -108,6 +109,8 @@ class ServerController extends GetxController with LogMixin {
   }
 
   Future<void> run() async {
+    if (_isRunning) return; // 防止重复点击
+    _isRunning = true;
     clearLog();
 
     // yys.exe 启动时会自动从配置文件读取 card_key，无需 OASX 写入
@@ -132,6 +135,8 @@ class ServerController extends GetxController with LogMixin {
         addLog('INFO: 已终止 python.exe');
       }
     } catch (_) {}
+    // 等待旧进程完全退出，避免端口占用
+    await Future.delayed(const Duration(seconds: 2));
     // 使用 Process.start 启动 pythonw.exe（无窗口版，不弹控制台）
     try {
       final env = Map<String, String>.from(Platform.environment);
@@ -156,6 +161,8 @@ class ServerController extends GetxController with LogMixin {
       addLog('INFO: yys.exe 已启动 (PID: ${process.pid})');
     } catch (e) {
       addLog('ERROR: 启动 yys.exe 失败: $e');
+    } finally {
+      _isRunning = false;
     }
   }
 
